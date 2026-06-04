@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Library — Stotra Saara</title>
+<meta name="description" content="Browse the full library of sacred stotras and mantras on Stotra Saara — with transliteration, translation and meaning in 18 languages.">
+<link rel="icon" type="image/png" href="assets/images/Logo.png">
+<link rel="apple-touch-icon" href="assets/images/Logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FDF6E8;--card:#FBF0D8;--border:#C9973A;--gold:#8B5E1A;--saffron:#B8520E;--brown:#3D2008;--muted:#7A5230;--dark:#1A0F05;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--brown);font-family:'Crimson Pro',Georgia,serif;font-size:18px;line-height:1.8;}
+
+/* ── NAVBAR ── */
+.navbar{background:var(--dark);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(201,151,58,.25);position:sticky;top:0;z-index:100;gap:16px;}
+.nav-logo{display:flex;align-items:center;text-decoration:none;flex-shrink:0;}
+.nav-logo-circle{width:42px;height:42px;border-radius:50%;overflow:hidden;border:2px solid rgba(201,151,58,.5);background:rgba(201,151,58,.1);}
+.nav-logo-circle img{width:100%;height:100%;object-fit:cover;display:block;font-size:0;}
+.nav-links{display:flex;gap:18px;align-items:center;}
+.nav-links a{font-family:'Cinzel Decorative',serif;font-size:.56rem;letter-spacing:.1em;color:rgba(253,246,232,.45);text-decoration:none;text-transform:uppercase;transition:color .18s;}
+.nav-links a:hover,.nav-links a.active{color:var(--border);}
+.nav-lang-wrap{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.nav-lang-lbl{font-family:'Cinzel Decorative',serif;font-size:.48rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(253,246,232,.3);white-space:nowrap;}
+.nav-lang-select{padding:5px 26px 5px 10px;font-family:'Crimson Pro',serif;font-size:.82rem;color:rgba(253,246,232,.75);background:rgba(201,151,58,.08);border:1px solid rgba(201,151,58,.3);border-radius:4px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23C9973A' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;min-width:130px;}
+.nav-lang-select:focus{outline:1px solid var(--border);}
+.nav-lang-select option{background:#1A0F05;color:rgba(253,246,232,.85);}
+
+/* ── PAGE HEADER ── */
+.page-header{background:var(--dark);padding:52px 28px 44px;text-align:center;border-bottom:2px solid rgba(201,151,58,.2);position:relative;}
+.page-header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%,rgba(201,151,58,.08) 0%,transparent 65%);pointer-events:none;}
+.ph-om{font-size:2rem;color:var(--gold);display:block;margin-bottom:10px;opacity:.7;}
+.ph-title{font-family:'Cinzel Decorative',serif;font-size:1.8rem;color:var(--border);margin-bottom:8px;position:relative;}
+.ph-sub{font-size:.95rem;color:rgba(253,246,232,.4);letter-spacing:.1em;position:relative;}
+
+/* ── LAYOUT ── */
+.lib-wrap{max-width:960px;margin:0 auto;padding:48px 24px 64px;display:grid;grid-template-columns:280px 1fr;gap:36px;align-items:start;}
+@media(max-width:760px){.lib-wrap{grid-template-columns:1fr;}}
+
+/* ── TREE SIDEBAR ── */
+.tree-panel{background:var(--card);border:1px solid rgba(201,151,58,.2);border-radius:8px;overflow:hidden;position:sticky;top:74px;}
+.tree-panel-head{background:rgba(201,151,58,.1);border-bottom:1px solid rgba(201,151,58,.2);padding:14px 18px;}
+.tree-panel-head-lbl{font-family:'Cinzel Decorative',serif;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--saffron);}
+.tree-search{width:100%;margin-top:10px;padding:7px 12px;font-family:'Crimson Pro',serif;font-size:.9rem;color:var(--brown);background:var(--bg);border:1px solid rgba(201,151,58,.3);border-radius:4px;}
+.tree-search:focus{outline:1px solid var(--border);}
+.tree-search::placeholder{color:var(--muted);opacity:.6;}
+
+.tree{padding:12px 0;}
+.tree-group{}
+.tree-group-header{display:flex;align-items:center;gap:8px;padding:9px 18px;cursor:pointer;transition:background .15s;user-select:none;}
+.tree-group-header:hover{background:rgba(201,151,58,.08);}
+.tree-arrow{font-size:.65rem;color:var(--muted);transition:transform .2s;flex-shrink:0;}
+.tree-group.open .tree-arrow{transform:rotate(90deg);}
+.tree-group-icon{font-size:1.1rem;flex-shrink:0;}
+.tree-group-name{font-family:'Cinzel Decorative',serif;font-size:.62rem;color:var(--gold);letter-spacing:.05em;}
+.tree-group-badge{margin-left:auto;font-family:'Cinzel Decorative',serif;font-size:.44rem;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border-radius:3px;}
+.tree-group-badge.live{background:rgba(201,151,58,.18);color:var(--saffron);border:1px solid rgba(201,151,58,.3);}
+.tree-group-badge.soon{background:rgba(122,82,48,.1);color:var(--muted);border:1px dashed rgba(122,82,48,.25);}
+
+.tree-children{display:none;padding:4px 0 8px 0;border-top:1px solid rgba(201,151,58,.08);}
+.tree-group.open .tree-children{display:block;}
+
+.tree-sub-group{padding:6px 18px 6px 36px;}
+.tree-sub-label{font-family:'Cinzel Decorative',serif;font-size:.52rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;display:flex;align-items:center;gap:8px;}
+.tree-sub-label::after{content:'';flex:1;height:1px;background:rgba(201,151,58,.15);}
+
+.tree-link{display:flex;align-items:center;gap:8px;padding:6px 18px 6px 36px;text-decoration:none;transition:background .15s;}
+.tree-link:hover{background:rgba(201,151,58,.08);}
+.tree-link-dot{width:5px;height:5px;border-radius:50%;background:rgba(201,151,58,.3);flex-shrink:0;}
+.tree-link.live .tree-link-dot{background:var(--saffron);}
+.tree-link-text{font-size:.88rem;color:var(--brown);line-height:1.4;}
+.tree-link.soon .tree-link-text{color:var(--muted);opacity:.55;font-style:italic;}
+.tree-link.active .tree-link-text{color:var(--gold);font-weight:600;}
+
+/* ── MAIN CONTENT ── */
+.lib-main{}
+.lib-section{margin-bottom:44px;}
+.lib-sec-lbl{font-family:'Cinzel Decorative',serif;font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--saffron);margin-bottom:8px;display:flex;align-items:center;gap:10px;}
+.lib-sec-lbl::after{content:'';flex:1;height:1px;background:linear-gradient(to right,rgba(201,151,58,.35),transparent);}
+.lib-sec-title{font-family:'Cinzel Decorative',serif;font-size:1.2rem;color:var(--gold);margin-bottom:20px;}
+
+/* Stotra card */
+.stotra-card{background:var(--card);border:1px solid rgba(201,151,58,.2);border-left:3px solid var(--border);border-radius:6px;padding:22px 22px 18px;margin-bottom:16px;transition:box-shadow .18s;}
+.stotra-card:hover{box-shadow:0 4px 20px rgba(201,151,58,.12);}
+.stotra-card.soon{border-left-color:rgba(201,151,58,.2);opacity:.65;}
+.sc-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px;flex-wrap:wrap;}
+.sc-title{font-family:'Cinzel Decorative',serif;font-size:.9rem;color:var(--gold);}
+.sc-badge{font-family:'Cinzel Decorative',serif;font-size:.46rem;letter-spacing:.12em;text-transform:uppercase;padding:3px 8px;border-radius:3px;flex-shrink:0;}
+.sc-badge.live{background:rgba(201,151,58,.15);color:var(--saffron);border:1px solid rgba(201,151,58,.3);}
+.sc-badge.soon{background:transparent;color:var(--muted);border:1px dashed rgba(122,82,48,.3);}
+.sc-meta{font-size:.84rem;color:var(--muted);font-style:italic;margin-bottom:10px;}
+.sc-links{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;}
+.sc-link{display:inline-block;background:rgba(201,151,58,.08);border:1px solid rgba(201,151,58,.22);border-radius:4px;padding:4px 11px;font-family:'Cinzel Decorative',serif;font-size:.54rem;letter-spacing:.06em;color:var(--gold);text-decoration:none;transition:all .16s;}
+.sc-link:hover{background:var(--border);color:#fff;}
+.sc-link.locked{opacity:.28;cursor:not-allowed;pointer-events:none;}
+.sc-read-btn{display:inline-block;border:1px solid var(--border);color:var(--border);font-family:'Cinzel Decorative',serif;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;padding:8px 18px;border-radius:4px;text-decoration:none;transition:all .18s;margin-top:12px;}
+.sc-read-btn:hover{background:var(--border);color:#fff;}
+
+/* progress bar */
+.sc-prog-lbl{font-family:'Cinzel Decorative',serif;font-size:.52rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;margin-top:10px;}
+.sc-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:4px;}
+.sc-bar-label{font-size:.78rem;color:var(--muted);min-width:160px;}
+.sc-bar-wrap{flex:1;background:rgba(201,151,58,.12);border-radius:3px;height:4px;}
+.sc-bar-fill{height:4px;border-radius:3px;background:linear-gradient(to right,var(--saffron),var(--border));}
+.sc-bar-pct{font-family:'Cinzel Decorative',serif;font-size:.5rem;color:var(--saffron);min-width:36px;text-align:right;}
+
+/* ── FOOTER ── */
+footer{background:var(--dark);color:rgba(253,246,232,.4);text-align:center;padding:44px 20px;font-size:.88rem;line-height:2;}
+.footer-logo-circle{width:54px;height:54px;border-radius:50%;overflow:hidden;border:2px solid rgba(201,151,58,.28);margin:0 auto 12px;background:rgba(201,151,58,.08);}
+.footer-logo-circle img{width:100%;height:100%;object-fit:cover;display:block;font-size:0;}
+footer strong{color:var(--border);}
+.footer-mantra{font-style:italic;color:rgba(253,246,232,.55);margin-bottom:14px;}
+.footer-links{display:flex;justify-content:center;gap:18px;margin:10px 0;flex-wrap:wrap;}
+.footer-links a{font-family:'Cinzel Decorative',serif;font-size:.54rem;letter-spacing:.1em;color:rgba(253,246,232,.28);text-decoration:none;text-transform:uppercase;transition:color .18s;}
+.footer-links a:hover{color:var(--border);}
+.footer-copy{font-size:.72rem;color:rgba(253,246,232,.2);margin-top:10px;}
+
+@media(max-width:700px){
+  .page-header{padding:40px 20px 36px;}
+  .ph-title{font-size:1.4rem;}
+  .lib-wrap{padding:32px 16px 48px;}
+  .tree-panel{position:static;}
+  .nav-lang-lbl{display:none;}
+  .nav-lang-select{min-width:110px;font-size:.75rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar" role="navigation">
+  <a href="index.html" class="nav-logo" aria-label="Stotra Saara Home">
+    <div class="nav-logo-circle">
+      <img src="assets/images/Logo.png" alt="Stotra Saara"/>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a href="about.html">About</a>
+    <a href="library.html" class="active">Library</a>
+  </div>
+  <div class="nav-lang-wrap">
+    <span class="nav-lang-lbl">Language</span>
+    <select class="nav-lang-select" onchange="saveLang(this.value)" aria-label="Select language">
+      <optgroup label="Available Now">
+        <option value="en">English</option>
+        <option value="hi">हिन्दी — Hindi</option>
+        <option value="kn">ಕನ್ನಡ — Kannada</option>
+        <option value="ta">தமிழ் — Tamil</option>
+        <option value="te">తెలుగు — Telugu</option>
+        <option value="mr">मराठी — Marathi</option>
+        <option value="ml">മലയാളം — Malayalam</option>
+        <option value="bn">বাংলা — Bengali</option>
+        <option value="gu">ગુજરાતી — Gujarati</option>
+        <option value="pa">ਪੰਜਾਬੀ — Punjabi</option>
+        <option value="or">ଓଡ଼ିଆ — Odia</option>
+      </optgroup>
+      <optgroup label="Coming Soon">
+        <option disabled>Español — Spanish</option>
+        <option disabled>Français — French</option>
+        <option disabled>Deutsch — German</option>
+        <option disabled>Português — Portuguese</option>
+        <option disabled>Bahasa — Indonesian</option>
+        <option disabled>日本語 — Japanese</option>
+        <option disabled>العربية — Arabic</option>
+      </optgroup>
+    </select>
+  </div>
+</nav>
+
+<!-- ── PAGE HEADER ── -->
+<div class="page-header">
+  <span class="ph-om">ॐ</span>
+  <div class="ph-title">Sacred Library</div>
+  <div class="ph-sub">Browse all stotras, mantras and sacred texts</div>
+</div>
+
+<!-- ── MAIN ── -->
+<div class="lib-wrap">
+
+  <!-- TREE SIDEBAR -->
+  <aside class="tree-panel" aria-label="Library navigation">
+    <div class="tree-panel-head">
+      <div class="tree-panel-head-lbl">Navigate by Stotra</div>
+      <input class="tree-search" type="search" placeholder="Search stotras…" id="treeSearch" autocomplete="off"/>
+    </div>
+    <nav class="tree" id="treeNav">
+
+      <!-- Guru Gita -->
+      <div class="tree-group open" data-group="guru-gita">
+        <div class="tree-group-header" onclick="toggleGroup(this)">
+          <span class="tree-arrow">▶</span>
+          <span class="tree-group-icon">📖</span>
+          <span class="tree-group-name">Guru Gita</span>
+          <span class="tree-group-badge live">Live</span>
+        </div>
+        <div class="tree-children">
+          <div class="tree-sub-group">
+            <div class="tree-sub-label">Prathamadhyaya</div>
+            <a href="guru-gita/prathamadhyaya/shlokas-1-10.html" class="tree-link live">
+              <span class="tree-link-dot"></span>
+              <span class="tree-link-text">Shlokas 1–10</span>
+            </a>
+            <a href="guru-gita/prathamadhyaya/shlokas-11-20.html" class="tree-link live">
+              <span class="tree-link-dot"></span>
+              <span class="tree-link-text">Shlokas 11–20</span>
+            </a>
+            <a href="guru-gita/prathamadhyaya/shlokas-21-30.html" class="tree-link live">
+              <span class="tree-link-dot"></span>
+              <span class="tree-link-text">Shlokas 21–30</span>
+            </a>
+            <a href="guru-gita/prathamadhyaya/shlokas-31-40.html" class="tree-link live">
+              <span class="tree-link-dot"></span>
+              <span class="tree-link-text">Shlokas 31–40</span>
+            </a>
+            <a href="guru-gita/prathamadhyaya/shlokas-41-50.html" class="tree-link live">
+              <span class="tree-link-dot"></span>
+              <span class="tree-link-text">Shlokas 41–50</span>
+            </a>
+            <span class="tree-link soon">
+              <span class="tree-link-dot"></span>
+              <span class="tree-link-text">Shlokas 51–60</span>
+            </span>
+            <span class="tree-link soon">
+              <span class="tree-link-dot"></span>
+              <span class="tree-link-text">Shlokas 61–70</span>
+            </span>
+            <span class="tree-link soon">
+              <span class="tree-link-dot"></span>
+              <span class="tree-link-text">Shlokas 71–80</span>
+            </span>
+            <span class="tree-link soon">
+              <span class="tree-link-dot"></span>
+              <span class="tree-link-text">Shlokas 81–90</span>
+            </span>
+            <span class="tree-link soon">
+              <span class="tree-link-dot"></span>
+              <span class="tree-link-text">Shlokas 91–100</span>
+            </span>
+            <span class="tree-link soon">
+              <span class="tree-link-dot"></span>
+              <span class="tree-link-text">Shlokas 101–108</span>
+            </span>
+          </div>
+          <div class="tree-sub-group">
+            <div class="tree-sub-label">Dwitiyodhyaya</div>
+            <span class="tree-link soon">
+              <span class="tree-link-dot"></span>
+              <span class="tree-link-text">Shlokas 109–243 · Coming soon</span>
+            </span>
+          </div>
+          <div class="tree-sub-group">
+            <div class="tree-sub-label">Tritiyodhyaya</div>
+            <span class="tree-link soon">
+              <span class="tree-link-dot"></span>
+              <span class="tree-link-text">Shlokas 244–352 · Coming soon</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ganapathi Atharvasheesha -->
+      <div class="tree-group" data-group="ganapathi">
+        <div class="tree-group-header" onclick="toggleGroup(this)">
+          <span class="tree-arrow">▶</span>
+          <span class="tree-group-icon">🐘</span>
+          <span class="tree-group-name">Ganapathi Atharvasheesha</span>
+          <span class="tree-group-badge soon">Soon</span>
+        </div>
+        <div class="tree-children">
+          <span class="tree-link soon" style="padding-left:28px">
+            <span class="tree-link-dot"></span>
+            <span class="tree-link-text">Coming soon</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Vishnu Sahasranamam -->
+      <div class="tree-group" data-group="vishnu">
+        <div class="tree-group-header" onclick="toggleGroup(this)">
+          <span class="tree-arrow">▶</span>
+          <span class="tree-group-icon">🪷</span>
+          <span class="tree-group-name">Vishnu Sahasranamam</span>
+          <span class="tree-group-badge soon">Soon</span>
+        </div>
+        <div class="tree-children">
+          <span class="tree-link soon" style="padding-left:28px">
+            <span class="tree-link-dot"></span>
+            <span class="tree-link-text">Coming soon</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Bhagavad Gita -->
+      <div class="tree-group" data-group="bhagavad-gita">
+        <div class="tree-group-header" onclick="toggleGroup(this)">
+          <span class="tree-arrow">▶</span>
+          <span class="tree-group-icon">📜</span>
+          <span class="tree-group-name">Bhagavad Gita</span>
+          <span class="tree-group-badge soon">Soon</span>
+        </div>
+        <div class="tree-children">
+          <span class="tree-link soon" style="padding-left:28px">
+            <span class="tree-link-dot"></span>
+            <span class="tree-link-text">18 chapters · Coming soon</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Sri Rudram -->
+      <div class="tree-group" data-group="rudram">
+        <div class="tree-group-header" onclick="toggleGroup(this)">
+          <span class="tree-arrow">▶</span>
+          <span class="tree-group-icon">🔱</span>
+          <span class="tree-group-name">Sri Rudram</span>
+          <span class="tree-group-badge soon">Soon</span>
+        </div>
+        <div class="tree-children">
+          <span class="tree-link soon" style="padding-left:28px">
+            <span class="tree-link-dot"></span>
+            <span class="tree-link-text">Coming soon</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Lalitha Sahasranama -->
+      <div class="tree-group" data-group="lalitha">
+        <div class="tree-group-header" onclick="toggleGroup(this)">
+          <span class="tree-arrow">▶</span>
+          <span class="tree-group-icon">🌸</span>
+          <span class="tree-group-name">Lalitha Sahasranama</span>
+          <span class="tree-group-badge soon">Soon</span>
+        </div>
+        <div class="tree-children">
+          <span class="tree-link soon" style="padding-left:28px">
+            <span class="tree-link-dot"></span>
+            <span class="tree-link-text">Coming soon</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Sri Suktam -->
+      <div class="tree-group" data-group="sri-suktam">
+        <div class="tree-group-header" onclick="toggleGroup(this)">
+          <span class="tree-arrow">▶</span>
+          <span class="tree-group-icon">✨</span>
+          <span class="tree-group-name">Sri Suktam</span>
+          <span class="tree-group-badge soon">Soon</span>
+        </div>
+        <div class="tree-children">
+          <span class="tree-link soon" style="padding-left:28px">
+            <span class="tree-link-dot"></span>
+            <span class="tree-link-text">Coming soon</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Purusha Suktam -->
+      <div class="tree-group" data-group="purusha">
+        <div class="tree-group-header" onclick="toggleGroup(this)">
+          <span class="tree-arrow">▶</span>
+          <span class="tree-group-icon">🌿</span>
+          <span class="tree-group-name">Purusha Suktam</span>
+          <span class="tree-group-badge soon">Soon</span>
+        </div>
+        <div class="tree-children">
+          <span class="tree-link soon" style="padding-left:28px">
+            <span class="tree-link-dot"></span>
+            <span class="tree-link-text">Coming soon</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Narayana Suktam -->
+      <div class="tree-group" data-group="narayana">
+        <div class="tree-group-header" onclick="toggleGroup(this)">
+          <span class="tree-arrow">▶</span>
+          <span class="tree-group-icon">🪷</span>
+          <span class="tree-group-name">Narayana Suktam</span>
+          <span class="tree-group-badge soon">Soon</span>
+        </div>
+        <div class="tree-children">
+          <span class="tree-link soon" style="padding-left:28px">
+            <span class="tree-link-dot"></span>
+            <span class="tree-link-text">Coming soon</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Vayu Stuti -->
+      <div class="tree-group" data-group="vayu">
+        <div class="tree-group-header" onclick="toggleGroup(this)">
+          <span class="tree-arrow">▶</span>
+          <span class="tree-group-icon">🌬️</span>
+          <span class="tree-group-name">Vayu Stuti</span>
+          <span class="tree-group-badge soon">Soon</span>
+        </div>
+        <div class="tree-children">
+          <span class="tree-link soon" style="padding-left:28px">
+            <span class="tree-link-dot"></span>
+            <span class="tree-link-text">Coming soon</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Raghavendra Stotram -->
+      <div class="tree-group" data-group="raghavendra">
+        <div class="tree-group-header" onclick="toggleGroup(this)">
+          <span class="tree-arrow">▶</span>
+          <span class="tree-group-icon">🙏</span>
+          <span class="tree-group-name">Raghavendra Stotram</span>
+          <span class="tree-group-badge soon">Soon</span>
+        </div>
+        <div class="tree-children">
+          <span class="tree-link soon" style="padding-left:28px">
+            <span class="tree-link-dot"></span>
+            <span class="tree-link-text">Coming soon</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Durga Saptashati -->
+      <div class="tree-group" data-group="durga">
+        <div class="tree-group-header" onclick="toggleGroup(this)">
+          <span class="tree-arrow">▶</span>
+          <span class="tree-group-icon">⚔️</span>
+          <span class="tree-group-name">Durga Saptashati</span>
+          <span class="tree-group-badge soon">Soon</span>
+        </div>
+        <div class="tree-children">
+          <span class="tree-link soon" style="padding-left:28px">
+            <span class="tree-link-dot"></span>
+            <span class="tree-link-text">700 verses · Coming soon</span>
+          </span>
+        </div>
+      </div>
+
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="lib-main">
+
+    <!-- NOW AVAILABLE -->
+    <div class="lib-section">
+      <div class="lib-sec-lbl">Now Available</div>
+      <div class="lib-sec-title">Read Now</div>
+
+      <!-- Guru Gita Card -->
+      <div class="stotra-card">
+        <div class="sc-head">
+          <div class="sc-title">Sri Guru Gita — गुरुगीता</div>
+          <span class="sc-badge live">Live</span>
+        </div>
+        <div class="sc-meta">Skanda Purana · Uttara Khanda · 352 Shlokas · 3 Adhyayas</div>
+        <p style="font-size:.95rem;color:var(--brown);line-height:1.85;margin-bottom:4px;">A sacred dialogue between Lord Shiva and Goddess Parvati on the glory and necessity of the Guru. Considered the essence of all Vedas, Shastras and Puranas — every syllable a Mantra-Raja.</p>
+
+        <div class="sc-prog-lbl">Progress</div>
+        <div class="sc-bar-row">
+          <span class="sc-bar-label">Prathamadhyaya (1–108)</span>
+          <div class="sc-bar-wrap"><div class="sc-bar-fill" style="width:46%"></div></div>
+          <span class="sc-bar-pct">46%</span>
+        </div>
+        <div class="sc-bar-row">
+          <span class="sc-bar-label">Dwitiyodhyaya (109–243)</span>
+          <div class="sc-bar-wrap"><div class="sc-bar-fill" style="width:0%"></div></div>
+          <span class="sc-bar-pct">0%</span>
+        </div>
+        <div class="sc-bar-row">
+          <span class="sc-bar-label">Tritiyodhyaya (244–352)</span>
+          <div class="sc-bar-wrap"><div class="sc-bar-fill" style="width:0%"></div></div>
+          <span class="sc-bar-pct">0%</span>
+        </div>
+
+        <div class="sc-links">
+          <a href="guru-gita/prathamadhyaya/shlokas-1-10.html" class="sc-link">Shlokas 1–10</a>
+          <a href="guru-gita/prathamadhyaya/shlokas-11-20.html" class="sc-link">Shlokas 11–20</a>
+          <a href="guru-gita/prathamadhyaya/shlokas-21-30.html" class="sc-link">Shlokas 21–30</a>
+          <a href="guru-gita/prathamadhyaya/shlokas-31-40.html" class="sc-link">Shlokas 31–40</a>
+          <a href="guru-gita/prathamadhyaya/shlokas-41-50.html" class="sc-link">Shlokas 41–50</a>
+          <span class="sc-link locked">Shlokas 51–60</span>
+          <span class="sc-link locked">Shlokas 61–70</span>
+          <span class="sc-link locked">Shlokas 71–80</span>
+          <span class="sc-link locked">Shlokas 81–90</span>
+          <span class="sc-link locked">Shlokas 91–100</span>
+          <span class="sc-link locked">Shlokas 101–108</span>
+        </div>
+        <a href="guru-gita/prathamadhyaya/shlokas-1-10.html" class="sc-read-btn">Begin Reading ▶</a>
+      </div>
+    </div>
+
+    <!-- COMING SOON -->
+    <div class="lib-section">
+      <div class="lib-sec-lbl">Coming Soon</div>
+      <div class="lib-sec-title">Forthcoming Texts</div>
+
+      <div class="stotra-card soon">
+        <div class="sc-head">
+          <div class="sc-title">Ganapathi Atharvasheesha</div>
+          <span class="sc-badge soon">Coming Soon</span>
+        </div>
+        <div class="sc-meta">Upanishad of Ganapathi · Atharva Veda</div>
+      </div>
+
+      <div class="stotra-card soon">
+        <div class="sc-head">
+          <div class="sc-title">Vishnu Sahasranamam</div>
+          <span class="sc-badge soon">Coming Soon</span>
+        </div>
+        <div class="sc-meta">1000 names of Vishnu · Mahabharata, Anushasana Parva</div>
+      </div>
+
+      <div class="stotra-card soon">
+        <div class="sc-head">
+          <div class="sc-title">Bhagavad Gita</div>
+          <span class="sc-badge soon">Coming Soon</span>
+        </div>
+        <div class="sc-meta">700 verses · 18 chapters · Mahabharata, Bhishma Parva</div>
+      </div>
+
+      <div class="stotra-card soon">
+        <div class="sc-head">
+          <div class="sc-title">Sri Rudram</div>
+          <span class="sc-badge soon">Coming Soon</span>
+        </div>
+        <div class="sc-meta">Namakam & Chamakam · Krishna Yajurveda</div>
+      </div>
+
+      <div class="stotra-card soon">
+        <div class="sc-head">
+          <div class="sc-title">Lalitha Sahasranama</div>
+          <span class="sc-badge soon">Coming Soon</span>
+        </div>
+        <div class="sc-meta">1000 names of the Goddess · Brahmanda Purana</div>
+      </div>
+
+      <div class="stotra-card soon">
+        <div class="sc-head">
+          <div class="sc-title">Sri Suktam</div>
+          <span class="sc-badge soon">Coming Soon</span>
+        </div>
+        <div class="sc-meta">Vedic hymn to Goddess Lakshmi · Rigveda Khilani</div>
+      </div>
+
+      <div class="stotra-card soon">
+        <div class="sc-head">
+          <div class="sc-title">Purusha Suktam</div>
+          <span class="sc-badge soon">Coming Soon</span>
+        </div>
+        <div class="sc-meta">Hymn to the cosmic being · Rigveda 10.90</div>
+      </div>
+
+      <div class="stotra-card soon">
+        <div class="sc-head">
+          <div class="sc-title">Narayana Suktam</div>
+          <span class="sc-badge soon">Coming Soon</span>
+        </div>
+        <div class="sc-meta">Vedic hymn to Narayana · Krishna Yajurveda</div>
+      </div>
+
+      <div class="stotra-card soon">
+        <div class="sc-head">
+          <div class="sc-title">Vayu Stuti</div>
+          <span class="sc-badge soon">Coming Soon</span>
+        </div>
+        <div class="sc-meta">Hymn to Mukhyaprana · Sri Madhvacharya</div>
+      </div>
+
+      <div class="stotra-card soon">
+        <div class="sc-head">
+          <div class="sc-title">Raghavendra Stotram</div>
+          <span class="sc-badge soon">Coming Soon</span>
+        </div>
+        <div class="sc-meta">Hymn to Sri Raghavendra Swami · Appannacharya</div>
+      </div>
+
+      <div class="stotra-card soon">
+        <div class="sc-head">
+          <div class="sc-title">Durga Saptashati</div>
+          <span class="sc-badge soon">Coming Soon</span>
+        </div>
+        <div class="sc-meta">700 verses · 13 chapters · Markandeya Purana</div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer role="contentinfo">
+  <div class="footer-logo-circle">
+    <img src="assets/images/Logo.png" alt="Stotra Saara"/>
+  </div>
+  <div class="footer-mantra">
+    <strong>॥ गुरुर्ब्रह्मा गुरुर्विष्णुः गुरुर्देवो महेश्वरः ॥</strong><br>
+    ॥ गुरुः साक्षात् परब्रह्म तस्मै श्रीगुरवे नमः ॥
+  </div>
+  <div>Stotra Saara — स्तोत्र सार · The Essence of Sacred Hymns · Powered by AI</div>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="library.html">Library</a>
+  </div>
+  <div class="footer-copy">© 2026 Stotra Saara · CC BY-NC 4.0 · AI-generated content · Built with devotion 🙏</div>
+</footer>
+
+<script>
+function toggleGroup(header) {
+  const group = header.closest('.tree-group');
+  group.classList.toggle('open');
+}
+
+// Tree search filter
+document.getElementById('treeSearch').addEventListener('input', function() {
+  const q = this.value.trim().toLowerCase();
+  document.querySelectorAll('.tree-group').forEach(group => {
+    const name = group.querySelector('.tree-group-name').textContent.toLowerCase();
+    if (!q || name.includes(q)) {
+      group.style.display = '';
+      if (q) group.classList.add('open');
+    } else {
+      // Also search children
+      const childLinks = Array.from(group.querySelectorAll('.tree-link-text'));
+      const match = childLinks.some(el => el.textContent.toLowerCase().includes(q));
+      group.style.display = match ? '' : 'none';
+      if (match && q) group.classList.add('open');
+    }
+  });
+});
+
+// Language persistence
+function saveLang(code) {
+  localStorage.setItem('stotrasaara-lang', code);
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('stotrasaara-lang');
+  const sel = document.querySelector('.nav-lang-select');
+  if (saved && sel) {
+    const opt = sel.querySelector(`option[value="${saved}"]`);
+    if (opt && !opt.disabled) sel.value = saved;
+  }
+});
+</script>
+</body>
+</html>
